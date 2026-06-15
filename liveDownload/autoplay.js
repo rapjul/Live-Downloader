@@ -29,8 +29,8 @@ async function injectAutoplay(tabId) {
           ['pointerdown', 'mousedown', 'mouseup', 'click'].forEach(type =>
             el.dispatchEvent(new MouseEvent(type, {
               bubbles: true, cancelable: true, view: window,
-              clientX: el.getBoundingClientRect().left + el.offsetWidth  / 2,
-              clientY: el.getBoundingClientRect().top  + el.offsetHeight / 2
+              clientX: el.getBoundingClientRect().left + el.offsetWidth / 2,
+              clientY: el.getBoundingClientRect().top + el.offsetHeight / 2
             }))
           );
         }
@@ -46,11 +46,11 @@ async function injectAutoplay(tabId) {
         // Strategy 3: Generic play button (class, aria-label, text content)
         for (const el of document.querySelectorAll('button, [role="button"], a, div')) {
           if (!el.offsetParent) continue;
-          const t  = el.textContent?.trim().toLowerCase() || '';
-          const c  = el.className?.toLowerCase() || '';
+          const t = el.textContent?.trim().toLowerCase() || '';
+          const c = el.className?.toLowerCase() || '';
           const ar = el.getAttribute('aria-label')?.toLowerCase() || '';
           if (c.includes('btn_play') || c.includes('play-btn') || c.includes('play_btn') ||
-              ar.includes('play') || t === 'play' || t === '재생') {
+            ar.includes('play') || t === 'play' || t === '재생') {
             fireClick(el);
             return 'play-button:' + (el.className || el.id || t);
           }
@@ -63,7 +63,7 @@ async function injectAutoplay(tabId) {
           if (video.paused) {
             video.muted = false;
             const p = video.play();
-            if (p) p.catch(() => { video.muted = true; video.play().catch(() => {}); });
+            if (p) p.catch(() => { video.muted = true; video.play().catch(() => { }); });
           }
           return 'video-click';
         }
@@ -79,3 +79,6 @@ async function injectAutoplay(tabId) {
     return null;
   }
 }
+
+// Expose globally for service worker and page scripts
+self.injectAutoplay = injectAutoplay;

@@ -94,7 +94,7 @@
     <!-- Source URL (clickable to check if broadcast is still live) -->
     <div id="live-source-url-container" class="live-source-url-container">
       <span class="url-label">📺 Source:</span>
-      <a id="live-source-url" href="#" target="_blank" class="live-source-url" title="Click to open stream page (check if still broadcasting)">Loading...</a>
+      <a id="live-source-url" href="#" target="_blank" rel="noopener" class="live-source-url" title="Click to open stream page (check if still broadcasting)">Loading...</a>
     </div>
     
     <!-- Completion screen (hidden until recording ends) -->
@@ -222,7 +222,7 @@
 
 Use the [key] format for simple lookup, or chain transformations with [key]<search, replace><search, replace>...
 The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the value with underscores.">
-            <label for="filename">Filename <a data-href="faq10" target="_blank">Format</a></label>
+            <label for="filename">Filename <a data-href="faq10" target="_blank" rel="noopener">Format</a></label>
             <input type="text" id="filename">
           </div>
           <div class="contents" title="Download jobs with multiple threads to increase speed">
@@ -240,7 +240,7 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
           <label for="autoclose">Auto Close When Done</label>
           <input type="checkbox" id="autoclose">
           <label for="mime-watch">
-            <a data-href="faq12" target="_blank">Improved Media Detection</a>
+            <a data-href="faq12" target="_blank" rel="noopener">Improved Media Detection</a>
           </label>
           <input type="checkbox" id="mime-watch">
           <label for="online-resolve-name">Try to Resolve Filename from Server</label>
@@ -258,8 +258,8 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
             <option value="lowest">Select Lowest Quality</option>
           </select>
           <span class="sep"></span>
-          <a target="_blank" href="https://webbrowsertools.com/test-download-with/">Test Video Downloading</a>
-          <a target="_blank" href="https://webbrowsertools.com/repair-video/">Repair Video File</a>
+          <a target="_blank" rel="noopener" href="https://webbrowsertools.com/test-download-with/">Test Video Downloading</a>
+          <a target="_blank" rel="noopener" href="https://webbrowsertools.com/repair-video/">Repair Video File</a>
         </div>
       </div>
     </div>
@@ -343,85 +343,85 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="batch-size">
             <span class="setting-label-main">Batch Size</span>
             <span class="setting-label-desc">Number of segments per batch file (VOD downloads only)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="range" id="batch-size" min="10" max="1000" step="10" value="20">
+            <input type="range" id="batch-size" min="10" max="1000" step="10" value="20" title="Batch Size">
             <span class="range-value" id="batch-size-value">20</span>
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="auto-concat">
             <span class="setting-label-main">Auto-concat on stream end</span>
             <span class="setting-label-desc">Automatically concatenate when stream ends naturally</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="checkbox" id="auto-concat">
+            <input type="checkbox" id="auto-concat" title="Auto-concat on stream end">
           </div>
         </div>
       </div>
         
         <!-- Live Recording Threads hidden - v0.6.08 uses sequential streaming -->
         <div class="setting-row" style="display: none;">
-          <div class="setting-label">
+          <label class="setting-label" for="live-threads">
             <span class="setting-label-main">Live Recording Threads</span>
             <span class="setting-label-desc">Deprecated - v0.6.08 uses sequential streaming</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="live-threads" min="1" max="5" value="1">
+            <input type="number" id="live-threads" min="1" max="5" value="1" title="Live Recording Threads">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="max-manifest-errors">
             <span class="setting-label-main">Max Manifest Errors</span>
             <span class="setting-label-desc">Auto-stop after this many consecutive manifest fetch failures (when Resilient Mode is OFF)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="max-manifest-errors" min="3" max="50" value="10">
+            <input type="number" id="max-manifest-errors" min="3" max="50" value="10" title="Max Manifest Errors">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="resilient-mode">
             <span class="setting-label-main">Resilient Mode</span>
             <span class="setting-label-desc">Keep trying on network errors - never auto-stop, wait for stream to return</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="checkbox" id="resilient-mode" checked>
+            <input type="checkbox" id="resilient-mode" checked title="Resilient Mode">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="recovery-poll-interval">
             <span class="setting-label-main">Recovery Poll Interval (minutes)</span>
             <span class="setting-label-desc">How often to check for new stream when broadcast is interrupted (Resilient Mode)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="recovery-poll-interval" min="1" max="30" value="5">
+            <input type="number" id="recovery-poll-interval" min="1" max="30" value="5" title="Recovery Poll Interval in Minutes">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="max-errors-before-recovery">
             <span class="setting-label-main">Errors Before Recovery</span>
             <span class="setting-label-desc">Number of consecutive errors before entering recovery mode (~3s each)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="max-errors-before-recovery" min="20" max="500" value="100">
+            <input type="number" id="max-errors-before-recovery" min="20" max="500" value="100" title="Errors Before Recovery">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="translate-titles">
             <span class="setting-label-main">Auto-Translate Titles</span>
             <span class="setting-label-desc">Automatically translate stream titles to English before saving (uses Google Translate)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="checkbox" id="translate-titles">
+            <input type="checkbox" id="translate-titles" title="Auto-Translate Titles">
           </div>
         </div>
 
@@ -431,42 +431,42 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
         <h3 class="settings-section-title">Wait for Start</h3>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="wait-check-interval">
             <span class="setting-label-main">Check Interval (minutes)</span>
             <span class="setting-label-desc">How often to refresh page when waiting for broadcast</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="wait-check-interval" min="5" max="60" value="15">
+            <input type="number" id="wait-check-interval" min="5" max="60" value="15" title="Check Interval in Minutes">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="wait-initial-wait">
             <span class="setting-label-main">Initial Wait (seconds)</span>
             <span class="setting-label-desc">Wait after page load before checking for streams</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="wait-initial-wait" min="5" max="60" value="10">
+            <input type="number" id="wait-initial-wait" min="5" max="60" value="10" title="Initial Wait in Seconds">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="wait-max-tabs">
             <span class="setting-label-main">Max Waiting Tabs</span>
             <span class="setting-label-desc">Maximum number of tabs that can wait simultaneously</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="wait-max-tabs" min="1" max="20" value="10">
+            <input type="number" id="wait-max-tabs" min="1" max="20" value="10" title="Max Waiting Tabs">
           </div>
         </div>
         
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="wait-monitor-timeout">
             <span class="setting-label-main">Monitor Window Timeout (seconds)</span>
             <span class="setting-label-desc">How long to wait for each broadcast before moving to next (min: 10, max: auto-calculated)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="wait-monitor-timeout" min="10" max="180" value="45">
+            <input type="number" id="wait-monitor-timeout" min="10" max="180" value="45" title="Monitor Window Timeout in Seconds">
           </div>
         </div>
       </div>
@@ -476,52 +476,52 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
         <h3 class="settings-section-title">Other Settings</h3>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-filename">
             <span class="setting-label-main">Live Recording Filename</span>
             <span class="setting-label-desc">Template for live stream recordings. Tokens: [title], [hostname], [q:selector|method|default]</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="text" id="settings-filename" value="[meta.name]" style="min-width: 250px; font-family: monospace;">
+            <input type="text" id="settings-filename" value="[meta.name]" style="min-width: 250px; font-family: monospace;" title="Live Recording Filename Template" placeholder="[meta.name]">
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-filename-vod">
             <span class="setting-label-main">VOD Download Filename</span>
             <span class="setting-label-desc">Template for VOD downloads. Same tokens as above. [title] usually contains the streamer name for VODs.</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="text" id="settings-filename-vod" value="[title]" style="min-width: 250px; font-family: monospace;">
+            <input type="text" id="settings-filename-vod" value="[title]" style="min-width: 250px; font-family: monospace;" title="VOD Download Filename Template" placeholder="[title]">
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-threads">
             <span class="setting-label-main">Number of Threads</span>
             <span class="setting-label-desc">Parallel download connections (1-5)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="settings-threads" min="1" max="5" value="3">
+            <input type="number" id="settings-threads" min="1" max="5" value="3" title="Number of Threads">
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-error-tolerance">
             <span class="setting-label-main">Error Threshold</span>
             <span class="setting-label-desc">Network errors before failing (1-100)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="number" id="settings-error-tolerance" min="1" max="100" value="30">
+            <input type="number" id="settings-error-tolerance" min="1" max="100" value="30" title="Error Threshold">
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-quality">
             <span class="setting-label-main">Quality Selection</span>
             <span class="setting-label-desc">How to choose stream quality when multiple are available</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <select id="settings-quality">
+            <select id="settings-quality" title="Quality Selection">
               <option value="highest">Best</option>
               <option value="selector">Select For Each</option>
             </select>
@@ -529,22 +529,22 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-autoclose">
             <span class="setting-label-main">Auto Close When Done</span>
             <span class="setting-label-desc">Close window after download completes</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="checkbox" id="settings-autoclose">
+            <input type="checkbox" id="settings-autoclose" title="Auto Close When Done">
           </div>
         </div>
 
         <div class="setting-row">
-          <div class="setting-label">
+          <label class="setting-label" for="settings-mime-watch">
             <span class="setting-label-main">Detect Streams in XHR Requests</span>
             <span class="setting-label-desc">Intercept XHR responses to catch streams loaded via JavaScript (broader detection, higher overhead)</span>
-          </div>
+          </label>
           <div class="setting-control">
-            <input type="checkbox" id="settings-mime-watch">
+            <input type="checkbox" id="settings-mime-watch" title="Detect Streams in XHR Requests">
           </div>
         </div>
       </div>
