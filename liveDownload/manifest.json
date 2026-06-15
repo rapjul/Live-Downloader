@@ -1,9 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/chrome-manifest",
 	"manifest_version": 3,
-	"version": "0.7.43.1",
-	"name": "liveDownload",
-	"description": "Monitor and record live streams from sites that permit recording",
+	"version": "0.7.44",
+	"name": "Live Downloader",
+	"description": "Monitor and record live streams from sites that permit recording. Also directly download VODs from supported sites.",
 	"permissions": [
 		"storage",
 		"contextMenus",
@@ -22,7 +22,7 @@
 	"host_permissions": [
 		"*://*/*"
 	],
-	"homepage_url": "https://github.com/mountlord/liveDownload",
+	"homepage_url": "https://github.com/rapjul/Live-Downloader",
 	"background": {
 		"service_worker": "worker.js"
 	},
