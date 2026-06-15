@@ -198,10 +198,17 @@ chrome.tabs.onRemoved.addListener(tabId => {
    MESSAGE ROUTER
    =========================================== */
 
+/**
+ * Releases the power keep-awake lock if no pages are actively recording or monitoring.
+ * Sends a message to query active pages and releases the lock if none respond positively.
+ * @returns {void}
+ */
 const raip = () => {
   if (chrome.power) {
     chrome.runtime.sendMessage({ method: 'any-active' }, r => {
-      chrome.runtime.lastError;
+      if (chrome.runtime.lastError) {
+        // Suppress unchecked runtime.lastError errors when there are no listeners
+      }
       if (r !== true) chrome.power.releaseKeepAwake();
     });
   }

@@ -151,11 +151,15 @@ helper.options = ({ meta }) => {
   };
 
   if (meta.ext === 'm3u8' || meta.ext === 'mpd') {
-    // Stream — save as TS or MKV container
+    // Stream — save as TS, MKV, or MP4 container
     const format = document.getElementById('default-format').value;
-    options.types[0].accept = format === 'ts'
-      ? { 'video/MP2T': ['.ts'] }
-      : { 'video/mkv':  ['.mkv'] };
+    if (format === 'mp4') {
+      options.types[0].accept = { 'video/mp4': ['.mp4'] };
+    } else if (format === 'ts') {
+      options.types[0].accept = { 'video/MP2T': ['.ts'] };
+    } else {
+      options.types[0].accept = { 'video/mkv':  ['.mkv'] };
+    }
 
     options.suggestedName =
       (meta.gname || meta.name || 'Untitled') +

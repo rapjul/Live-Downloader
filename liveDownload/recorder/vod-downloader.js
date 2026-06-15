@@ -66,6 +66,9 @@ class VodDownloader {
     const writable = await fileHandle.createWritable();
     try {
       let completed = 0;
+      const isMp4 = fileHandle.name.toLowerCase().endsWith('.mp4');
+      let transmuxer = null;
+      let transmuxedChunks = [];
 
       for (let i = 0; i < expanded.length; i += this.concurrency) {
         if (this.aborted) throw new Error('VodDownloader: aborted');
@@ -80,8 +83,30 @@ class VodDownloader {
         // Write batch in order
         for (const buf of buffers) {
           if (buf) {
-            await writable.write(new Uint8Array(buf));
-            this._bytesLoaded += buf.byteLength;
+            const uint8 = new Uint8Array(buf);
+            if (isMp4 && uint8.length > 0 && uint8[0] === 0x47) {
+              if (!transmuxer) {
+                transmuxer = new muxjs.mp4.Transmuxer();
+                transmuxer.on('data', (segment) => {
+                  if (segment.initSegment) {
+                    transmuxedChunks.push(new Uint8Array(segment.initSegment));
+                  }
+                  transmuxedChunks.push(new Uint8Array(segment.data));
+                });
+              }
+              transmuxer.push(uint8);
+              transmuxer.flush();
+              if (transmuxedChunks.length > 0) {
+                for (const chunk of transmuxedChunks) {
+                  await writable.write(chunk);
+                  this._bytesLoaded += chunk.byteLength;
+                }
+                transmuxedChunks = [];
+              }
+            } else {
+              await writable.write(uint8);
+              this._bytesLoaded += uint8.byteLength;
+            }
           }
           completed++;
           this.onProgress?.(completed, total, this._bytesLoaded);

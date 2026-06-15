@@ -480,7 +480,28 @@
         case S.Success: {
           const bytes = result.bytes();
           if (this.outputWritable) {
-            await this.outputWritable.write(bytes);
+            if (this.finalFileHandle && this.finalFileHandle.name.toLowerCase().endsWith('.mp4') && bytes.length > 0 && bytes[0] === 0x47) {
+              if (!this._transmuxer) {
+                this._transmuxer = new muxjs.mp4.Transmuxer();
+                this._transmuxerBuffer = [];
+                this._transmuxer.on('data', (segment) => {
+                  if (segment.initSegment) {
+                    this._transmuxerBuffer.push(new Uint8Array(segment.initSegment));
+                  }
+                  this._transmuxerBuffer.push(new Uint8Array(segment.data));
+                });
+              }
+              this._transmuxer.push(bytes);
+              this._transmuxer.flush();
+              if (this._transmuxerBuffer.length > 0) {
+                for (const tBuf of this._transmuxerBuffer) {
+                  await this.outputWritable.write(tBuf);
+                }
+                this._transmuxerBuffer = [];
+              }
+            } else {
+              await this.outputWritable.write(bytes);
+            }
           }
           this.metrics.segmentsDownloaded++;
           this.metrics.bytesDownloaded            += bytes.byteLength;
@@ -1017,6 +1038,9 @@
           if (this.usingOPFS && this.finalFileHandle) await this.triggerOPFSDownload();
         } catch (e) {
           console.error('[liveDownload] Error closing output file:', e);
+        } finally {
+          this._transmuxer = null;
+          this._transmuxerBuffer = [];
         }
       }
 
@@ -1099,6 +1123,8 @@
       try {
         await this.outputWritable.close();
         this.outputWritable = null;
+        this._transmuxer = null;
+        this._transmuxerBuffer = [];
         console.log(`[liveDownload] ✓ Writable closed: ${filename}`);
 
         // Allow Chrome time to rename .crswap → .ts
