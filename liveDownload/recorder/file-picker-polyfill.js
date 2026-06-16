@@ -1,12 +1,39 @@
 /* liveDownload */
 
+/**
+ * Wrap a picker function to prevent concurrent invocations that trigger
+ * "File picker already active" browser errors.
+ * @param {Function} originalFn - The original window picker function.
+ * @returns {Function} The wrapped picker function.
+ */
+function wrapPickerPreventConcurrent(originalFn) {
+  let activePromise = null;
+  return function (...args) {
+    if (activePromise) {
+      console.warn('[liveDownload] Picker already active, reusing existing picker session.');
+      return activePromise;
+    }
+    activePromise = originalFn.apply(this, args);
+    activePromise.finally(() => {
+      activePromise = null;
+    });
+    return activePromise;
+  };
+}
+
+if (typeof window.showDirectoryPicker === 'function') {
+  window.showDirectoryPicker = wrapPickerPreventConcurrent(window.showDirectoryPicker);
+}
+if (typeof window.showSaveFilePicker === 'function') {
+  window.showSaveFilePicker = wrapPickerPreventConcurrent(window.showSaveFilePicker);
+}
+if (typeof window.showOpenFilePicker === 'function') {
+  window.showOpenFilePicker = wrapPickerPreventConcurrent(window.showOpenFilePicker);
+}
+
 // Polyfill for browsers without native File System Access API (e.g. Brave, Firefox).
-// Falls back to Origin Private File System (OPFS) for all file operations.
-// Both showSaveFilePicker and showDirectoryPicker are marked _polyfilled = true
-// so callers can detect OPFS mode and trigger a download on completion.
 
 if (typeof self.showSaveFilePicker === 'undefined') {
-
   // Trigger a browser download from an OPFS file handle, then remove the OPFS entry.
   FileSystemFileHandle.prototype.download = async function () {
     const blob = await this.getFile();
@@ -22,7 +49,7 @@ if (typeof self.showSaveFilePicker === 'undefined') {
 
     setTimeout(() => {
       URL.revokeObjectURL(objectURL);
-      navigator.storage.getDirectory().then(root => root.removeEntry(this.name)).catch(() => {});
+      navigator.storage.getDirectory().then(root => root.removeEntry(this.name)).catch(() => { });
     }, 200);
   };
 
