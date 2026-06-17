@@ -18,8 +18,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* Settings Panel */
@@ -367,6 +372,7 @@
     transform: translateX(400px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -378,6 +384,7 @@
     transform: translateX(0);
     opacity: 1;
   }
+
   to {
     transform: translateX(400px);
     opacity: 0;
@@ -387,7 +394,7 @@
 /* Hide old settings popup - replaced by new settings panel */
 
 /* Keep old gear icon visible but hide its dropdown */
-#options > div {
+#options>div {
   display: none !important;
 }
 
@@ -403,4 +410,12 @@
 /* Hide my added settings-trigger */
 #settings-trigger {
   display: none !important;
+}
+
+.copy-chip:hover {
+  background: #d1d5db !important;
+}
+
+.copy-chip:active {
+  background: #9ca3af !important;
 }

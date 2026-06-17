@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="google" content="notranslate">
-  <title>liveDownload</title>
+  <title>Live Downloader</title>
   <link rel="stylesheet" type="text/css" href="index.css">
   <link rel="stylesheet" type="text/css" href="settings.css">
   <link rel="stylesheet" type="text/css" href="modern-ui.css">
@@ -484,6 +484,118 @@ The search pattern is a RegExp. For instance, <\s, _> replaces all spaces in the
           <div class="setting-control">
             <input type="number" id="wait-monitor-timeout" min="10" max="180" value="45"
               title="Monitor Window Timeout in Seconds">
+          </div>
+        </div>
+      </div>
+
+      <!-- Website-Specific Filename Selector -->
+      <div class="settings-section">
+        <h3 class="settings-section-title">Website-Specific Selector</h3>
+
+        <div class="setting-row">
+          <label class="setting-label" for="selector-enabled">
+            <span class="setting-label-main">Use CSS Selector for Filename</span>
+            <span class="setting-label-desc" id="selector-host-desc">Extract filename from page elements on this
+              website</span>
+          </label>
+          <div class="setting-control">
+            <input type="checkbox" id="selector-enabled" title="Enable CSS Selector Filename">
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent" style="display: none;">
+          <label class="setting-label" for="selector-query">
+            <span class="setting-label-main">CSS Selector</span>
+            <span class="setting-label-desc">CSS Selector of element (e.g. h1.title, .stream-name)</span>
+          </label>
+          <div class="setting-control">
+            <input type="text" id="selector-query" style="min-width: 250px;" placeholder="h1.title"
+              title="CSS Selector">
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent" style="display: none;">
+          <label class="setting-label" for="selector-type">
+            <span class="setting-label-main">Extract Option</span>
+            <span class="setting-label-desc">Choose to read text content or an attribute</span>
+          </label>
+          <div class="setting-control">
+            <select id="selector-type" title="Extraction Type">
+              <option value="text">Text Content</option>
+              <option value="attribute">Attribute Value</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent" id="selector-attr-row" style="display: none;">
+          <label class="setting-label" for="selector-attr">
+            <span class="setting-label-main">Attribute Name</span>
+            <span class="setting-label-desc">e.g., content, alt, title</span>
+          </label>
+          <div class="setting-control">
+            <input type="text" id="selector-attr" placeholder="content" title="Attribute Name">
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent" style="display: none;">
+          <label class="setting-label" for="selector-template">
+            <span class="setting-label-main">Filename Template</span>
+            <span class="setting-label-desc">Prepend/append text. Default: [selector]</span>
+          </label>
+          <div class="setting-control">
+            <input type="text" id="selector-template" style="min-width: 250px;" placeholder="[selector]"
+              title="Filename Template">
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent"
+          style="display: none; flex-direction: column; align-items: flex-start;">
+          <span class="setting-label-main" style="margin-bottom: 6px;">Supported Placeholders (Click to copy)</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="selector-chips">
+            <code class="copy-chip"
+              style="cursor: pointer; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; transition: background 0.15s;"
+              title="Click to copy">[selector]</code>
+            <code class="copy-chip"
+              style="cursor: pointer; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; transition: background 0.15s;"
+              title="Click to copy">[title]</code>
+            <code class="copy-chip"
+              style="cursor: pointer; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; transition: background 0.15s;"
+              title="Click to copy">[hostname]</code>
+            <code class="copy-chip"
+              style="cursor: pointer; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; transition: background 0.15s;"
+              title="Click to copy">[date]</code>
+            <code class="copy-chip"
+              style="cursor: pointer; background: #e5e7eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; transition: background 0.15s;"
+              title="Click to copy">[datetime]</code>
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent" style="display: none;">
+          <label class="setting-label" for="selector-sanitize">
+            <span class="setting-label-main">Sanitize Filename</span>
+            <span class="setting-label-desc">Replace invalid filename characters with underscores</span>
+          </label>
+          <div class="setting-control">
+            <input type="checkbox" id="selector-sanitize" checked title="Sanitize Filename">
+          </div>
+        </div>
+
+        <div class="setting-row selector-dependent"
+          style="display: none; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; box-sizing: border-box;">
+          <span class="setting-label-main">Filename Preview</span>
+          <div
+            style="width: 100%; display: flex; flex-direction: column; gap: 6px; font-size: 13px; box-sizing: border-box;">
+            <div
+              style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 6px; align-items: center; gap: 8px;">
+              <span style="color: #6b7280; white-space: nowrap;">Before sanitization:</span>
+              <span id="preview-raw" style="font-family: monospace; word-break: break-all; text-align: right;">-</span>
+            </div>
+            <div
+              style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.02); padding: 6px 12px; border-radius: 6px; align-items: center; gap: 8px;">
+              <span style="color: #6b7280; white-space: nowrap;">After sanitization:</span>
+              <span id="preview-sanitized"
+                style="font-family: monospace; word-break: break-all; font-weight: 500; color: #10b981; text-align: right;">-</span>
+            </div>
           </div>
         </div>
       </div>

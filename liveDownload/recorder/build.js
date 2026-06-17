@@ -1,8 +1,8 @@
 /* global VodDownloader, args, tabId */
 
-const response = ({url, responseHeaders = []}) => {
+const response = ({ url, responseHeaders = [] }) => {
   const headers = new Headers();
-  for (const {name, value} of responseHeaders) {
+  for (const { name, value } of responseHeaders) {
     headers.set(name, value);
   }
   return {
@@ -11,7 +11,13 @@ const response = ({url, responseHeaders = []}) => {
   };
 };
 
-const addEntries = async entries => {
+/**
+ * Resolves the filename template by retrieving settings, checking VOD/Live status,
+ * executing website-specific selectors, and parsing query expressions on the page.
+ *
+ * @returns {Promise<string>} The resolved filename template.
+ */
+const resolveFilenameTemplate = async () => {
   const prefs = await chrome.storage.local.get({
     'filename': '【[q:.nick|textContent|Unknown]】[title]',
     'filenameVOD': '[title]'
@@ -23,7 +29,7 @@ const addEntries = async entries => {
   try {
     const u = new URL(href);
     isVOD = u.hostname.includes('vod') || u.pathname.includes('/videos/');
-  } catch (_) {}
+  } catch (_) { }
 
   // Select the appropriate template
   prefs.filename = isVOD ? (prefs.filenameVOD || '[title]') : prefs.filename;
@@ -34,7 +40,77 @@ const addEntries = async entries => {
     const o = new URL(args.get('href'));
     hostname = o.hostname;
   }
-  catch (e) {}
+  catch (e) { }
+
+  // Website-specific filename query selector resolution
+  if (hostname !== 'NA') {
+    try {
+      const selStored = await chrome.storage.local.get('selector_settings');
+      const selectorSettings = selStored.selector_settings || {};
+      const siteConfig = selectorSettings[hostname];
+
+      if (siteConfig && siteConfig.enabled && siteConfig.query) {
+        /**
+         * Query selector and extract value from DOM.
+         * Runs in target page context.
+         * @param {string} query CSS selector
+         * @param {string} type extraction type ('text' or 'attribute')
+         * @param {string} attr attribute name
+         * @returns {string} extracted string value
+         */
+        const pageExtractor = (query, type, attr) => {
+          try {
+            const e = document.querySelector(query);
+            if (!e) return '';
+            return (type === 'attribute' && attr) ? (e.getAttribute(attr) || '') : (e.textContent || '');
+          } catch (_) {
+            return '';
+          }
+        };
+
+        const r = await chrome.scripting.executeScript({
+          target: { tabId },
+          func: pageExtractor,
+          args: [siteConfig.query, siteConfig.type || 'text', siteConfig.attr || '']
+        });
+
+        if (r && r[0] && r[0].result !== undefined) {
+          const extractedVal = r[0].result.trim();
+
+          // Formatter helper for two digit numbers
+          /**
+           * Pad number to 2 digits.
+           * @param {number} n
+           * @returns {string}
+           */
+          const pad2 = n => String(n).padStart(2, '0');
+          const now = new Date();
+          const dateStr = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+          const datetimeStr = `${dateStr}_${pad2(now.getHours())}-${pad2(now.getMinutes())}-${pad2(now.getSeconds())}`;
+          const pageTitle = args.get('title') || 'Untitled';
+
+          const template = siteConfig.template || '[selector]';
+          let resolvedName = template
+            .replace(/\[selector\]/g, extractedVal)
+            .replace(/\[title\]/g, pageTitle)
+            .replace(/\[hostname\]/g, hostname)
+            .replace(/\[date\]/g, dateStr)
+            .replace(/\[datetime\]/g, datetimeStr);
+
+          resolvedName = resolvedName.trim();
+          if (siteConfig.sanitize !== false) {
+            resolvedName = resolvedName.replace(/[\\/:*?"<>|]/g, '_');
+          }
+
+          if (resolvedName) {
+            prefs.filename = resolvedName;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[liveDownload] Per-website selector extraction failed:', err);
+    }
+  }
 
   // Extract [q:SELECTOR|method|default] tokens from the filename template.
   // Transformation chains <pattern, replace> that IMMEDIATELY follow a [q:...] token
@@ -73,7 +149,7 @@ const addEntries = async entries => {
                 } else {
                   value = e.textContent;
                 }
-              } catch (_) {}
+              } catch (_) { }
               value = value || defaultValue || '';
               results.push({ query, value });
             }
@@ -95,12 +171,12 @@ const addEntries = async entries => {
               let replaceStr = cm[2].trim();
               // Strip surrounding quotes from replacement
               if ((replaceStr.startsWith("'") && replaceStr.endsWith("'")) ||
-                  (replaceStr.startsWith('"') && replaceStr.endsWith('"'))) {
+                (replaceStr.startsWith('"') && replaceStr.endsWith('"'))) {
                 replaceStr = replaceStr.slice(1, -1);
               }
               try {
                 finalValue = finalValue.replace(new RegExp(searchPattern, 'g'), replaceStr);
-              } catch (_) {}
+              } catch (_) { }
             }
             // Clean up any trailing whitespace/punctuation left by transformations
             finalValue = finalValue.trim();
@@ -116,6 +192,83 @@ const addEntries = async entries => {
       }
     }
   }
+
+  return prefs.filename;
+};
+
+/**
+ * Iterates through all existing entries in the list and re-runs the
+ * placeholder replacement logic with the newly-resolved template.
+ *
+ * @returns {Promise<void>}
+ */
+window.updateAllFilenames = async () => {
+  const resolvedTemplate = await resolveFilenameTemplate();
+  const labels = document.querySelectorAll('#hrefs label');
+
+  let hostname = 'NA';
+  try {
+    const o = new URL(args.get('href'));
+    hostname = o.hostname;
+  } catch (e) { }
+
+  // Translate page title ONCE
+  let translatedTitle = args.get('title');
+  try {
+    const tsettings = await chrome.storage.local.get({ 'liveDownload_translateTitles': false });
+    if (tsettings['liveDownload_translateTitles'] && self.translateText && translatedTitle) {
+      const result = await self.translateText(translatedTitle);
+      if (result && result !== translatedTitle) {
+        translatedTitle = result;
+      }
+    }
+  } catch (e) { }
+
+  for (const div of labels) {
+    if (div.entry && div.meta) {
+      const entry = div.entry;
+      const meta = div.meta;
+      const en = div.querySelector('[data-id=name]');
+      const exn = div.querySelector('[data-id=extracted-name]');
+      const ex = div.querySelector('[data-id=ext]');
+
+      const rawName = replacePlaceholders(resolvedTemplate, {
+        'meta.name': meta.name,
+        'title': translatedTitle,
+        'hostname': hostname
+      });
+      meta.gname = en.textContent = en.title = rawName;
+
+      if (resolvedTemplate.includes('[meta.name]') === false) {
+        let displayName = meta.name;
+        if (entry.url) {
+          const url = entry.url.toLowerCase();
+          if (url.includes('master_playlist') || url.includes('auth_master_playlist')) {
+            displayName = 'Master Playlist';
+          } else if (url.includes('playlist.m3u8') || url.includes('.m3u8')) {
+            if (!displayName || displayName.toLowerCase() === 'manifest') {
+              displayName = 'Playlist';
+            }
+          }
+        }
+        exn.textContent = exn.title = '(' + displayName + ')';
+      } else {
+        exn.textContent = exn.title = '';
+      }
+
+      ex.textContent = meta.ext || 'N/A';
+    }
+  }
+};
+
+/**
+ * Adds entries to the stream selection list and resolves filenames.
+ *
+ * @param {Map} entries A map of stream URLs to stream entries.
+ * @returns {Promise<void>}
+ */
+const addEntries = async entries => {
+  const resolvedTemplate = await resolveFilenameTemplate();
 
   const t = document.getElementById('entry');
   let naming = 0;
@@ -227,17 +380,17 @@ const addEntries = async entries => {
     };
 
     const name = async () => {
-      let rawName = replacePlaceholders(prefs.filename, {
+      let rawName = replacePlaceholders(resolvedTemplate, {
         'meta.name': meta.name,
         'title': translatedTitle,
         'hostname': hostname
       });
       meta.gname = en.textContent = en.title = rawName;
 
-      if (prefs.filename.includes('[meta.name]') === false) {
+      if (resolvedTemplate.includes('[meta.name]') === false) {
         // Distinguish between Master Playlist and Media Playlist
         let displayName = meta.name;
-        
+
         // Always check URL patterns to distinguish playlist types
         if (entry.url) {
           const url = entry.url.toLowerCase();
@@ -251,7 +404,7 @@ const addEntries = async entries => {
             }
           }
         }
-        
+
         exn.textContent = exn.title = '(' + displayName + ')';
       }
 
@@ -286,7 +439,7 @@ const addEntries = async entries => {
             await name();
           }
           controller.abort();
-        }).catch(() => {});
+        }).catch(() => { });
       }
     }
 

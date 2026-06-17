@@ -1,4 +1,4 @@
-# liveDownload
+# Live Downloader
 
 A Chrome extension for unattended live stream recording and VOD downloading from any HLS/DASH-based streaming platform that permits downloads.
 
@@ -6,7 +6,7 @@ A Chrome extension for unattended live stream recording and VOD downloading from
 
 ## Features
 
-- **Unattended live recording** — add broadcaster URLs to the Watch List and liveDownload polls them automatically. When a stream goes live, recording starts without any user interaction.
+- **Unattended live recording** — add broadcaster URLs to the Watch List and Live Downloader polls them automatically. When a stream goes live, recording starts without any user interaction.
 - **Resilient recording** — survives network interruptions, CDN hiccups, and broadcaster restarts. Recovery mode detects stream resumption and continues recording into a new file automatically.
 - **VOD downloading** — download single or batch HLS/DASH VOD streams to a folder you choose.
 - **Auto-translate titles** — optionally translates Korean/Japanese stream titles to English before saving (uses Google Translate, opt-in, off by default).
@@ -17,13 +17,13 @@ A Chrome extension for unattended live stream recording and VOD downloading from
 
 ## Installation
 
-1. Download the latest release zip from the [Releases](https://github.com/mountlord/livedownload/releases) page
+1. Download the latest release zip from the [Releases](https://github.com/mountlord/Live Downloader/releases) page
 2. Unzip to a local folder - if live updates to extension are needed
 3. Open Chrome and navigate to `chrome://extensions`
 4. Enable **Developer mode** (top right)
-5. Drag & Drop liveDownload.zip OR do Step 6.
+5. Drag & Drop Live Downloader.zip OR do Step 6.
 6. Click **Load unpacked** and select the folder you unzipped in Step 2.
-7. The liveDownload icon appears in the toolbar
+7. The Live Downloader icon appears in the toolbar
 
 ---
 
@@ -31,15 +31,15 @@ A Chrome extension for unattended live stream recording and VOD downloading from
 
 ### Manual recording
 1. Navigate to a live stream page (e.g. `play.livebroadcast.com/broadcaster`)
-2. Click the liveDownload icon — the recorder window opens
+2. Click the Live Downloader icon — the recorder window opens
 3. Detected streams appear under **Available Streams**
 4. Select a stream and click **Download Selected**
 
 ### Auto-recording (unattended)
-1. Click the liveDownload icon to open the recorder window
+1. Click the Live Downloader icon to open the recorder window
 2. Expand the **Wait for Recording URLs** section
 3. Paste broadcaster URLs and click **+ Add**
-4. liveDownload polls each URL every 15 minutes (configurable). When a stream goes live, recording starts automatically.
+4. Live Downloader polls each URL every 15 minutes (configurable). When a stream goes live, recording starts automatically.
 
 ---
 
@@ -67,7 +67,7 @@ The WRU system is the heart of unattended recording.
 | **⏸️ Suspend** | Pause automatic polling |
 | **▶️ Resume** | Resume automatic polling |
 
-liveDownload skips URLs that are already recording — no duplicate recordings.
+Live Downloader skips URLs that are already recording — no duplicate recordings.
 
 ---
 
@@ -85,7 +85,7 @@ Once recording starts, the dashboard shows:
 
 ### Recovery Mode
 
-If the stream is interrupted (authentication expiry, broadcaster restart, network failure), liveDownload enters Recovery Mode:
+If the stream is interrupted (authentication expiry, broadcaster restart, network failure), Live Downloader enters Recovery Mode:
 
 - The current file is finalized and saved
 - A background tab opens the broadcaster's page
@@ -96,7 +96,7 @@ If the stream is interrupted (authentication expiry, broadcaster restart, networ
 
 ## VOD Downloads
 
-For pre-recorded content, liveDownload detects m3u8/mpd playlist URLs on the page and lists them under **Available Streams**.
+For pre-recorded content, Live Downloader detects m3u8/mpd playlist URLs on the page and lists them under **Available Streams**.
 
 - **Single download** — select one stream and click **Download Selected**
 - **Batch download** — select multiple streams, click **Download Selected**, choose a folder — each stream saves as a separate file
@@ -133,7 +133,7 @@ Recovery files from the same session share the same base name with a new timesta
 ### Converting to MP4
 
 ```bash
-ffmpeg -i recording.ts -c copy output.mp4
+ffmpeg -i recording.ts -c copy -movflags +faststart output.mp4
 ```
 
 > **Note:** ffmpeg may show "Packet corrupt" warnings when converting some recordings. This is cosmetic — the DTS values from recording's session clock are high but valid. Output quality is unaffected.
@@ -153,11 +153,11 @@ ffmpeg -i recording.ts -c copy output.mp4
 
 ## Privacy
 
-- **No telemetry.** liveDownload does not collect, transmit, or store any usage data.
+- **No telemetry.** Live Downloader does not collect, transmit, or store any usage data.
 - **No ads.** No advertising of any kind.
 - **Google Translate** is used only if you enable Auto-Translate Titles in Settings (off by default). When enabled, stream titles are sent to Google Translate. This feature is off by default. Use at your own choosing. This is the only feature where you data leaves your environment.
-- **Autoplay assistance.** To start stream playback on monitored pages, liveDownload injects mouse click events into the player area. This can be disabled in Settings.
-- **Sound permission.** To ensure autoplay works on monitored sites, liveDownload sets Chrome's sound permission to "Allow" for those origins. This setting is applied only to URLs you have added to the Watch List.
+- **Autoplay assistance.** To start stream playback on monitored pages, Live Downloader injects mouse click events into the player area. This can be disabled in Settings.
+- **Sound permission.** To ensure autoplay works on monitored sites, Live Downloader sets Chrome's sound permission to "Allow" for those origins. This setting is applied only to URLs you have added to the Watch List.
 
 ---
 
@@ -195,12 +195,12 @@ Chandler Stimson's https://github.com/chandler-stimson/live-stream-downloader
 
 AGPL 3.0 — see [LICENSE](LICENSE) for details.
 
-The Rust/WASM module (`livedownload_core`) is original work and distributed only in compiled binary form.
+The Rust/WASM module (`Live Downloader_core`) is original work and distributed only in compiled binary form.
 
 ---
 
 ## Donate
 
-If liveDownload has been useful to you, consider donating to [Save the Children](https://www.savethechildren.org/savekids).
+If Live Downloader has been useful to you, consider donating to [Save the Children](https://www.savethechildren.org/savekids).
 
-*liveDownload is not affiliated with Save the Children. The donate button opens their official donation page.*
+*Live Downloader is not affiliated with Save the Children. The donate button opens their official donation page.*
